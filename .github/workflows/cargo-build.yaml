@@ -1,0 +1,38 @@
+name: Cargo build & release
+
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest, ubuntu-24.04-arm]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build the binaries
+        run: cargo build --release
+
+      - name: Upload the dev artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: resource-monitor-${{ matrix.os }}-${{ github.run_id }}-dev
+          path: |
+            target/release/resource-monitor
+            target/release/resource-monitor.exe
+          compression-level: 6
+          retention-days: 30
+
+      - name: Upload the prod artifact
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: resource-monitor-${{ matrix.os }}-${{ github.run_id }}-prod
+          path: |
+            target/release/resource-monitor
+            target/release/resource-monitor.exe
+          compression-level: 6
