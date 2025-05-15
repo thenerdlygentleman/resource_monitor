@@ -1,3 +1,5 @@
-# Template
+# Resource Monitor
 
-Template repository.
+```shell
+sh monitor.sh
+```
